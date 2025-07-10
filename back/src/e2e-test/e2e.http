@@ -1,0 +1,17 @@
+@host = http://localhost:3000
+
+### health Check
+GET {{host}}/health
+Content-Type: application/json
+Accept: application/json
+
+
+### filter endpoint
+@parameter1=CO
+@parameter2=NO2
+@startDate=2023-01-01
+@endDate=2023-12-31
+
+GET {{host}}/filter?parameters={{parameter1}}&parameters={{parameter2}}&startDate={{startDate}}&endDate={{endDate}}
+Content-Type: application/json
+
