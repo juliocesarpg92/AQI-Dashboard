@@ -128,4 +128,42 @@ Jane,25,Los Angeles`
       "Should reject with database error"
     )
   })
+
+  test("should handle large CSV file efficiently", async () => {
+    // Arrange
+    const testCsvPath = path.join(tempDir, "test6.csv")
+    const csvRows = ["name,age,city"]
+    for (let i = 0; i < 10000; i++) {
+      csvRows.push(`Person${i},${20 + i},City${i}`)
+    }
+    const csvData = csvRows.join("\n")
+
+    await writeFile(testCsvPath, csvData)
+
+    let callCount = 0
+    const processedData: Record<string, any>[] = []
+    const chunkHandler = mock.fn(async (data: Record<string, any>[]) => {
+      callCount++
+      processedData.push(...data)
+      return Promise.resolve()
+    })
+
+    // Act
+    const startTime = Date.now()
+    await importCsvData(testCsvPath, chunkHandler, 500)
+    const endTime = Date.now()
+
+    // Assert
+    assert.strictEqual(
+      callCount,
+      20,
+      "chunkHandler should be called 20 times (10000 records / 500 chunk size)"
+    )
+    assert.strictEqual(
+      processedData.length,
+      10000,
+      "Should process all 10000 records"
+    )
+    assert.ok(endTime - startTime < 5000, "Should complete within 5 seconds")
+  })
 })
