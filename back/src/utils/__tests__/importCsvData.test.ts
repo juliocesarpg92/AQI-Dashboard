@@ -22,10 +22,10 @@ describe("importCsvData", () => {
   test("should process CSV file with data less than chunk size", async () => {
     // Arrange
     const testCsvPath = path.join(tempDir, "test1.csv")
-    const csvData = `name,age,city
-John,30,New York
-Jane,25,Los Angeles
-Bob,35,Chicago`
+    const csvData = `name;age;city
+John;30;New York
+Jane;25;Los Angeles
+Bob;35;Chicago`
 
     await writeFile(testCsvPath, csvData)
 
@@ -52,9 +52,9 @@ Bob,35,Chicago`
   test("should process CSV file with data equal to chunk size", async () => {
     // Arrange
     const testCsvPath = path.join(tempDir, "test2.csv")
-    const csvData = `name,age,city
-John,30,New York
-Jane,25,Los Angeles`
+    const csvData = `name;age;city
+John;30;New York
+Jane;25;Los Angeles`
 
     await writeFile(testCsvPath, csvData)
 
@@ -81,9 +81,9 @@ Jane,25,Los Angeles`
   test("should process CSV file with data greater than chunk size", async () => {
     // Arrange
     const testCsvPath = path.join(tempDir, "test3.csv")
-    const csvRows = ["name,age,city"]
+    const csvRows = ["name;age;city"]
     for (let i = 0; i < 5; i++) {
-      csvRows.push(`Person${i},${20 + i},City${i}`)
+      csvRows.push(`Person${i};${20 + i};City${i}`)
     }
     const csvData = csvRows.join("\n")
 
@@ -112,8 +112,8 @@ Jane,25,Los Angeles`
   test("should reject when chunkHandler throws an error during end", async () => {
     // Arrange
     const testCsvPath = path.join(tempDir, "test5.csv")
-    const csvData = `name,age,city
-  John,30,New York`
+    const csvData = `name;age;city
+  John;30;New York`
 
     await writeFile(testCsvPath, csvData)
 
@@ -129,12 +129,38 @@ Jane,25,Los Angeles`
     )
   })
 
+  test("should skip empty lines", async () => {
+    // Arrange
+    const testCsvPath = path.join(tempDir, "test6.csv")
+    const csvRows = ["name;age;city"]
+    for (let i = 0; i < 5; i++) {
+      csvRows.push(`Person${i};${20 + i};City${i}`)
+    }
+    csvRows.push(`;;`) // Add an empty row to test handling of empty lines
+    const csvData = csvRows.join("\n")
+
+    await writeFile(testCsvPath, csvData)
+
+    let callCount = 0
+    const processedData: Record<string, any>[] = []
+    const chunkHandler = mock.fn(async (data: Record<string, any>[]) => {
+      callCount++
+      processedData.push(...data)
+      return Promise.resolve()
+    })
+    // Act
+    await importCsvData(testCsvPath, chunkHandler, 2)
+
+    // Assert
+    assert.strictEqual(processedData.length, 5, "Should process only 5 records")
+  })
+
   test("should handle large CSV file efficiently", async () => {
     // Arrange
     const testCsvPath = path.join(tempDir, "test6.csv")
-    const csvRows = ["name,age,city"]
+    const csvRows = ["name;age;city"]
     for (let i = 0; i < 10000; i++) {
-      csvRows.push(`Person${i},${20 + i},City${i}`)
+      csvRows.push(`Person${i};${20 + i};City${i}`)
     }
     const csvData = csvRows.join("\n")
 
