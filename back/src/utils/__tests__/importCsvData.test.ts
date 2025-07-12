@@ -1,6 +1,5 @@
 import { describe, test, before, after, mock } from "node:test"
 import assert from "node:assert"
-import fs from "node:fs"
 import path from "node:path"
 import { tmpdir } from "node:os"
 import { mkdtemp, writeFile, rm } from "node:fs/promises"

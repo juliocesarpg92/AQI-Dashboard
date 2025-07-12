@@ -47,13 +47,13 @@ export default function importCsvData(
           },
         })
       )
-      .on("headers", (headers) => {
-        console.log(`CSV headers: ${headers.join(", ")}`)
-      })
+      // .on("headers", (headers) => {
+      //   console.log(`CSV headers: ${headers.join(", ")}`)
+      // })
       .on("data", (data) => {
         // skip records with null values
         if (Object.values(data).every((value) => value === null)) {
-          console.warn("Skipping record with null values:", data)
+          // console.warn("Skipping record with null values:", data)
           return
         }
 
