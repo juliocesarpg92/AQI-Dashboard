@@ -1,11 +1,11 @@
 import { describe, test, before, after, mock } from "node:test"
 import assert from "node:assert"
-import { fetchDataByFilter } from "../queries.js"
+import { prepareQueryFetchData } from "../queries.js"
 
 describe("fetchDataByFilter", () => {
   test("should generate correct query when no parameters are provided", async () => {
     const expectedQuery = "SELECT 1, * FROM air_quality_data WHERE 1=1"
-    const result = await fetchDataByFilter({})
+    const result = await prepareQueryFetchData({})
 
     // Verify the generated query
     assert.strictEqual(result.query, expectedQuery)
@@ -16,7 +16,7 @@ describe("fetchDataByFilter", () => {
     const expectedQuery =
       "SELECT 1, $1 AS co_gt, $2 AS no2_gt FROM air_quality_data WHERE 1=1"
     const values = ["co_gt", "no2_gt"]
-    const result = await fetchDataByFilter({ parameters: values })
+    const result = await prepareQueryFetchData({ parameters: values })
 
     // Verify the generated query
     assert.strictEqual(result.query, expectedQuery)
@@ -27,7 +27,7 @@ describe("fetchDataByFilter", () => {
     const expectedQuery =
       "SELECT 1, * FROM air_quality_data WHERE 1=1 AND date >= $1 AND date <= $2"
     const values = ["2023-01-01", "2023-12-31"]
-    const result = await fetchDataByFilter({
+    const result = await prepareQueryFetchData({
       startDate: values[0],
       endDate: values[1],
     })
@@ -41,7 +41,7 @@ describe("fetchDataByFilter", () => {
     const expectedQuery =
       "SELECT 1, $1 AS co_gt, $2 AS no2_gt FROM air_quality_data WHERE 1=1 AND date >= $3 AND date <= $4"
     const values = ["co_gt", "no2_gt", "2023-01-01", "2023-12-31"]
-    const result = await fetchDataByFilter({
+    const result = await prepareQueryFetchData({
       parameters: values.slice(0, 2),
       startDate: values[2],
       endDate: values[3],

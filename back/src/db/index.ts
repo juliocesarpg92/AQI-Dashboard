@@ -1,11 +1,12 @@
 import { Pool } from "pg"
 import {
-  checkTableExists,
-  checkTableHasData,
-  createTable,
-  dropTable,
-  fetchDataByFilter,
-  insertOne,
+  queryCheckTableExists,
+  queryCheckTableHasData,
+  queryCreateTableSchema,
+  queryDropTable,
+  prepareQueryFetchData,
+  queryInsertOne,
+  queryExtractTableColumnNames,
 } from "./queries.js"
 import importCsvData from "../utils/importCsvData.js"
 import { existsSync } from "node:fs"
@@ -42,17 +43,17 @@ export async function setupDb() {
   // }
 
   // check if the table already exists
-  const tableExists = await pool.query(checkTableExists)
+  const tableExists = await pool.query(queryCheckTableExists)
   if (tableExists.rows[0].exists) {
     console.log("Table already exists.")
   } else {
     console.log("Creating table...")
-    await pool.query(createTable)
+    await pool.query(queryCreateTableSchema)
     console.log("Table created successfully")
   }
 
   // check if the table has data
-  const hasData = await pool.query(checkTableHasData)
+  const hasData = await pool.query(queryCheckTableHasData)
   if (hasData.rows[0].has_data) {
     console.log("Table has data.")
     return
@@ -65,12 +66,12 @@ export async function setupDb() {
 async function bulkInsert(data: Record<string, any>[]) {
   for (const record of data) {
     console.log(`Inserting record: ${JSON.stringify(record)}`)
-    await pool.query(insertOne, Object.values(record))
+    await pool.query(queryInsertOne, Object.values(record))
   }
 }
 
 export async function fetchData(filter: Filter) {
-  const { query, values } = fetchDataByFilter(filter)
+  const { query, values } = prepareQueryFetchData(filter)
   console.log(`Executing query: ${query} with values: ${values}`)
   const result = await pool.query(query, values)
   console.log(`Fetched ${result.rowCount} records`)

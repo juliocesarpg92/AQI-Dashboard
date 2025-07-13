@@ -1,6 +1,6 @@
 import type { Filter } from "../models/filters.js"
 
-export const createTable = `
+export const queryCreateTableSchema = `
 -- Air Quality Monitoring Data Table
 CREATE TABLE air_quality_data (
     id SERIAL PRIMARY KEY,
@@ -37,7 +37,7 @@ COMMENT ON COLUMN air_quality_data.temperature IS 'Temperature in Celsius';
 COMMENT ON COLUMN air_quality_data.relative_humidity IS 'Relative humidity percentage';
 `
 
-export const checkTableExists = `
+export const queryCheckTableExists = `
 SELECT EXISTS (
     SELECT 1
     FROM information_schema.tables
@@ -45,21 +45,21 @@ SELECT EXISTS (
 );
 `
 
-export const checkTableHasData = `
+export const queryCheckTableHasData = `
 SELECT COUNT(*) > 0 AS has_data
 FROM air_quality_data;
 `
 
-export const dropTable = `
+export const queryDropTable = `
 DROP TABLE IF EXISTS air_quality_data;
 `
 
-export const insertOne = `
+export const queryInsertOne = `
 INSERT INTO air_quality_data (date, time, co_gt, pt08_s1_co, nmhc_gt, c6h6_gt, pt08_s2_nmhc, nox_gt, pt08_s3_nox, no2_gt, pt08_s4_no2, pt08_s5_o3, temperature, relative_humidity, absolute_humidity)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
 `
 
-export const fetchDataByFilter = (filter: Filter) => {
+export const prepareQueryFetchData = (filter: Filter) => {
   const { parameters, startDate, endDate } = filter
 
   const values: any[] = []
@@ -78,6 +78,7 @@ export const fetchDataByFilter = (filter: Filter) => {
 
   query += ` FROM air_quality_data WHERE 1=1`
 
+  // filter by date range
   if (startDate) {
     query += ` AND date >= $${paramIndex++}`
     values.push(startDate)
