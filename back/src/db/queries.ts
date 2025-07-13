@@ -45,6 +45,12 @@ SELECT EXISTS (
 );
 `
 
+export const queryExtractTableColumnNames = `
+SELECT column_name
+FROM information_schema.columns
+WHERE table_name = 'air_quality_data';
+`
+
 export const queryCheckTableHasData = `
 SELECT COUNT(*) > 0 AS has_data
 FROM air_quality_data;
@@ -65,15 +71,14 @@ export const prepareQueryFetchData = (filter: Filter) => {
   const values: any[] = []
   let paramIndex = 1
 
-  let query = `SELECT 1`
+  let query = `SELECT `
 
+  // filter by parameter
   if (parameters && parameters.length > 0) {
-    parameters.forEach((param) => {
-      query += `, $${paramIndex++} AS ${param}`
-      values.push(param)
-    })
+    query += `date, time, `
+    query += `${parameters.join(", ")}`
   } else {
-    query += `, *`
+    query += `*`
   }
 
   query += ` FROM air_quality_data WHERE 1=1`
@@ -87,6 +92,9 @@ export const prepareQueryFetchData = (filter: Filter) => {
     query += ` AND date <= $${paramIndex++}`
     values.push(endDate)
   }
+
+  // pagination
+  query += ` LIMIT 100 OFFSET 0`
 
   return { query, values }
 }

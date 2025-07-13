@@ -6,7 +6,7 @@ import { secureHeaders } from "hono/secure-headers"
 import { validateFilterSchema, type Filter } from "./models/filters.js"
 import { validator } from "hono/validator"
 import * as z from "zod/v4"
-import { fetchData, setupDb } from "./db/index.js"
+import { fetchColumnNames, fetchData, setupDb } from "./db/index.js"
 
 const app = new Hono()
 app.use(logger())
@@ -16,20 +16,32 @@ app.use(secureHeaders())
 // initialize db connection and import CSV data
 await setupDb()
 
-app.get(
+app.post(
   "/filter",
-  validator("query", (value, c) => {
+  validator("json", (value, c) => {
     const result = validateFilterSchema(value)
     if (!result.success) {
       return c.json(z.flattenError(result.error), 400)
     }
     return result.data
   }),
-  (c) => {
-    const filter: Filter = c.req.valid("query")
+  async (c) => {
+    const filter: Filter = c.req.valid("json")
 
-    const result = fetchData(filter)
-    if (!result) {
+    // white-listing parameters
+    if (filter.parameters) {
+      const allowedParameters = await fetchColumnNames()
+      const exists = filter.parameters.every((param) =>
+        allowedParameters.includes(param)
+      )
+      if (!exists) {
+        return c.json({ message: "Invalid parameters provided." }, 400)
+      }
+    }
+
+    const result = await fetchData(filter)
+
+    if (!result || result.length === 0) {
       return c.json({ message: "No data found for the given filter." }, 404)
     }
 

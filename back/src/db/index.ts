@@ -77,3 +77,8 @@ export async function fetchData(filter: Filter) {
   console.log(`Fetched ${result.rowCount} records`)
   return result.rows
 }
+
+export async function fetchColumnNames() {
+  const result = await pool.query(queryExtractTableColumnNames)
+  return result.rows.map((row) => row.column_name)
+}
