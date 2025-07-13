@@ -1,4 +1,4 @@
-@host = http://localhost:3000
+@host = http://localhost:8000
 
 ### health Check
 GET {{host}}/health
@@ -7,11 +7,16 @@ Accept: application/json
 
 
 ### filter endpoint
-@parameter1=CO
-@parameter2=NO2
-@startDate=2023-01-01
-@endDate=2023-12-31
+@parameter1=co_gt
+@parameter2=no2_gt
+@startDate=2004-03-01
+@endDate=2004-03-31
 
-GET {{host}}/filter?parameters={{parameter1}}&parameters={{parameter2}}&startDate={{startDate}}&endDate={{endDate}}
+POST {{host}}/filter
 Content-Type: application/json
 
+{
+  "parameters": ["{{parameter1}}", "{{parameter2}}"],
+  "startDate": "{{startDate}}",
+  "endDate": "{{endDate}}"
+}
