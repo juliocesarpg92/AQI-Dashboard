@@ -21,10 +21,28 @@ describe("importCsvData", () => {
   test("should process CSV file with data less than chunk size", async () => {
     // Arrange
     const testCsvPath = path.join(tempDir, "test1.csv")
-    const csvData = `name;age;city
-John;30;New York
-Jane;25;Los Angeles
-Bob;35;Chicago`
+    const csvData = `Date      ; Time    ; CO(GT); PT08.S1(CO); NMHC(GT); C6H6(GT); PT08.S2(NMHC); NOx(GT); PT08.S3(NOx); NO2(GT); PT08.S4(NO2); PT08.S5(O3); T   ; RH  ; AH    ; ; 
+10/03/2004; 18.00.00; 2,6   ; 1360       ; 150     ; 11,9    ; 1046         ; 166    ; 1056        ; 113    ; 1692        ; 1268       ; 13,6; 48,9; 0,7578; ; 
+10/03/2004; 19.00.00; 2     ; 1292       ; 112     ; 9,4     ; 955          ; 103    ; 1174        ; 92     ; 1559        ; 972        ; 13,3; 47,7; 0,7255; ; 
+10/03/2004; 20.00.00; 2,2   ; 1402       ; 88      ; 9,0     ; 939          ; 131    ; 1140        ; 114    ; 1555        ; 1074       ; 11,9; 54,0; 0,7502; ; 
+`
+
+    const firstRowResult = {
+      co_gt: 2.6,
+      pt08_s1_co: 1360,
+      nmhc_gt: 150,
+      c6h6_gt: 11.9,
+      pt08_s2_nmhc: 1046,
+      nox_gt: 166,
+      pt08_s3_nox: 1056,
+      no2_gt: 113,
+      pt08_s4_no2: 1692,
+      pt08_s5_o3: 1268,
+      t: 13.6,
+      rh: 48.9,
+      ah: 0.7578,
+      timestamp: new Date(2004, 2, 10, 18, 0, 0),
+    }
 
     await writeFile(testCsvPath, csvData)
 
@@ -39,6 +57,8 @@ Bob;35;Chicago`
     // Act
     await importCsvData(testCsvPath, chunkHandler, 500)
 
+    console.log("Processed Data:", processedData[0])
+    console.log("First record should match:", firstRowResult)
     // Assert
     assert.strictEqual(
       callCount,
@@ -46,6 +66,11 @@ Bob;35;Chicago`
       "chunkHandler should be called once at the end"
     )
     assert.strictEqual(processedData.length, 3, "Should process 3 records")
+    assert.deepStrictEqual(
+      processedData[0],
+      firstRowResult,
+      "First record should match"
+    )
   })
 
   test("should process CSV file with data equal to chunk size", async () => {

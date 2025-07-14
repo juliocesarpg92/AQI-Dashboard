@@ -35,13 +35,14 @@ export default function importCsvData(
             value = value.trim() // remove leading/trailing whitespace
             if (value === "" || value === "-200") return null
             if (header === "time") {
-              return value.replace(".", ":")
+              return value.replaceAll(".", ":")
             }
             if (header === "date") {
               const date = value.split("/")
               value = date.reverse().join("-")
               return new Date(value)
             }
+            value = value.replace(",", ".") // replace comma with dot for decimal values
             const numValue = parseFloat(value)
             return isNaN(numValue) ? value : numValue
           },
@@ -57,11 +58,25 @@ export default function importCsvData(
           return
         }
 
+        // combine date and time into a timestamp
+        data.timestamp = new Date(data.date)
+        if (data.time) {
+          const timeParts = data.time.split(":")
+          data.timestamp.setHours(
+            parseInt(timeParts[0], 10),
+            parseInt(timeParts[1], 10),
+            parseInt(timeParts[2] || "0", 10)
+          )
+        }
+        // remove date and time fields after combining
+        delete data.date
+        delete data.time
+
         chunks.push(data)
 
         if (chunks.length === chunkSize) {
           stream.pause()
-          // Create a copy of chunks to pass to chunkHandler
+          // create a copy of chunks to pass to chunkHandler
           chunkHandler([...chunks])
             .then(() => {
               stream.resume()

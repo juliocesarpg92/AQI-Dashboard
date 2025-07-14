@@ -4,8 +4,7 @@ export const queryCreateTableSchema = `
 -- Air Quality Monitoring Data Table
 CREATE TABLE air_quality_data (
     id SERIAL PRIMARY KEY,
-    date DATE NOT NULL,
-    time TIME NOT NULL,
+    timestamp TIMESTAMP NOT NULL,
     co_gt DECIMAL(10,4),                    -- CO(GT) - Carbon monoxide reference
     pt08_s1_co INTEGER,                     -- PT08.S1(CO) - CO sensor response
     nmhc_gt DECIMAL(10,4),                  -- NMHC(GT) - Non-methane hydrocarbons reference
@@ -18,14 +17,11 @@ CREATE TABLE air_quality_data (
     pt08_s5_o3 INTEGER,                     -- PT08.S5(O3) - Ozone sensor response
     temperature DECIMAL(5,2),               -- T - Temperature
     relative_humidity DECIMAL(5,2),         -- RH - Relative humidity
-    absolute_humidity DECIMAL(10,6),        -- AH - Absolute humidity
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    absolute_humidity DECIMAL(10,6)         -- AH - Absolute humidity
 );
 
 -- Create indexes for common queries
-CREATE INDEX idx_air_quality_date ON air_quality_data(date);
-CREATE INDEX idx_air_quality_datetime ON air_quality_data(date, time);
+CREATE INDEX idx_air_quality_datetime ON air_quality_data(timestamp);
 CREATE INDEX idx_air_quality_co ON air_quality_data(co_gt);
 CREATE INDEX idx_air_quality_no2 ON air_quality_data(no2_gt);
 
@@ -61,8 +57,8 @@ DROP TABLE IF EXISTS air_quality_data;
 `
 
 export const queryInsertOne = `
-INSERT INTO air_quality_data (date, time, co_gt, pt08_s1_co, nmhc_gt, c6h6_gt, pt08_s2_nmhc, nox_gt, pt08_s3_nox, no2_gt, pt08_s4_no2, pt08_s5_o3, temperature, relative_humidity, absolute_humidity)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)
+INSERT INTO air_quality_data (co_gt, pt08_s1_co, nmhc_gt, c6h6_gt, pt08_s2_nmhc, nox_gt, pt08_s3_nox, no2_gt, pt08_s4_no2, pt08_s5_o3, temperature, relative_humidity, absolute_humidity, timestamp)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
 `
 
 export const prepareQueryFetchData = (filter: Filter) => {
@@ -75,7 +71,7 @@ export const prepareQueryFetchData = (filter: Filter) => {
 
   // filter by parameter
   if (parameters && parameters.length > 0) {
-    query += `date, time, `
+    query += `timestamp, `
     query += `${parameters.join(", ")}`
   } else {
     query += `*`
@@ -85,11 +81,11 @@ export const prepareQueryFetchData = (filter: Filter) => {
 
   // filter by date range
   if (startDate) {
-    query += ` AND date >= $${paramIndex++}`
+    query += ` AND timestamp >= $${paramIndex++}`
     values.push(startDate)
   }
   if (endDate) {
-    query += ` AND date <= $${paramIndex++}`
+    query += ` AND timestamp <= $${paramIndex++}`
     values.push(endDate)
   }
 
