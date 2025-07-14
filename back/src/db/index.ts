@@ -22,6 +22,7 @@ const pool = new Pool({
 
 async function seedInitialData() {
   console.log("Seeding initial data...")
+  console.time("seeding")
   if (!process.env.CSV_FILE_PATH) {
     console.error("CSV_FILE_PATH environment variable is not set.")
     return
@@ -31,14 +32,16 @@ async function seedInitialData() {
     return
   }
   await importCsvData(process.env.CSV_FILE_PATH, bulkInsert, 500)
+  console.timeEnd("seeding")
 }
 
 export async function setupDb() {
+  // remove existing table in development mode
   // if (process.env.NODE_ENV === "development") {
   //   console.log(
   //     "Running in development mode, dropping existing table if it exists..."
   //   )
-  //   await pool.query(dropTable)
+  //   await pool.query(queryDropTable)
   //   console.log("Existing table dropped.")
   // }
 
