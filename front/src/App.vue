@@ -1,41 +1,43 @@
 <template>
   <div class="min-h-screen bg-background">
-    <!-- Header -->
+    <!-- HEADER -->
     <header class="border-b bg-card">
-      <div class="container mx-auto px-4 py-6">
+      <div class="max-w-7xl mx-auto px-2 md:px-4 py-6">
         <div class="flex items-center justify-between">
           <div>
+            <!-- TITLE -->
             <h1 class="text-3xl font-bold text-foreground">
-              Monitor de Calidad del Aire
+              Air Quality Monitor
             </h1>
+            <!-- SUBTITLE -->
             <p class="text-muted-foreground mt-1">
-              Visualización en tiempo real de datos ambientales
+              Real-time environmental data visualization
             </p>
           </div>
+          <!-- REFRESH BUTTON -->
           <div class="flex items-center gap-4">
             <Button
               variant="outline"
               size="sm"
               @click="refreshData"
               :disabled="loading"
-              aria-label="Actualizar todos los datos"
+              aria-label="Refresh all data"
             >
-              <span
-                :class="{ 'animate-spin': loading }"
+              <RotateCw
+                c:class="{ 'animate-spin': loading }"
                 class="inline-block w-4 h-4 mr-2"
-                >⟳</span
-              >
-              Actualizar
+              />
+              Refresh
             </Button>
           </div>
         </div>
       </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="container mx-auto px-4 py-8">
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-2 md:px-4 py-8">
       <div class="space-y-8">
-        <!-- Controls -->
+        <!-- CONTROLS -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <DateRangeFilter
             v-model="filters.dateRange"
@@ -44,14 +46,13 @@
           <ParameterSelector
             v-model="filters.parameter"
             :parameters="parameters"
-            @update:model-value="updateParameter"
           />
         </div>
 
-        <!-- Stats Cards -->
-        <StatsCards :data="data" :parameters="parameters" />
+        <!-- STATS CARDS -->
+        <!-- <StatsCards :data="data" :parameters="parameters" /> -->
 
-        <!-- Chart -->
+        <!-- CHART -->
         <AirQualityChart
           :data="chartData"
           :selected-parameter="selectedParameter"
@@ -61,26 +62,24 @@
           @refresh="refreshData"
         />
 
-        <!-- Footer Info -->
+        <!-- FOOTER INFO -->
         <Card class="p-6">
           <div
             class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-muted-foreground"
           >
             <div>
               <h4 class="font-semibold text-foreground mb-2">
-                Información del Dataset
+                Dataset Information
               </h4>
               <ul class="space-y-1">
-                <li>
-                  • Total de registros: {{ data.length.toLocaleString() }}
-                </li>
-                <li>• Período: {{ formatDateRange() }}</li>
-                <li>• Frecuencia: {{ filters.aggregation }}</li>
+                <li>• Total records: {{ data.length.toLocaleString() }}</li>
+                <li>• Period: {{ formatDateRange() }}</li>
+                <!-- <li>• Frequency: {{ filters.aggregation }}</li> -->
               </ul>
             </div>
             <div>
               <h4 class="font-semibold text-foreground mb-2">
-                Parámetros Monitoreados
+                Monitored Parameters
               </h4>
               <ul class="space-y-1">
                 <li v-for="param in parameters" :key="param.key">
@@ -89,12 +88,12 @@
               </ul>
             </div>
             <div>
-              <h4 class="font-semibold text-foreground mb-2">Optimizaciones</h4>
+              <h4 class="font-semibold text-foreground mb-2">Optimizations</h4>
               <ul class="space-y-1">
-                <li>• Caché inteligente: 5 min</li>
-                <li>• Agregación automática</li>
+                <li>• Smart cache: 5 min</li>
+                <li>• Auto aggregation</li>
                 <li>• Debouncing: 300ms</li>
-                <li>• Renderizado progresivo</li>
+                <li>• Progressive rendering</li>
               </ul>
             </div>
           </div>
@@ -112,9 +111,10 @@ import { formatDate } from "@/lib/utils"
 import AirQualityChart from "@/components/AirQualityChart.vue"
 import DateRangeFilter from "@/components/DateRangeFilter.vue"
 import ParameterSelector from "@/components/ParameterSelector.vue"
-import StatsCards from "@/components/StatsCards.vue"
-import Card from "@/components/ui/card"
-import Button from "@/components/ui/button"
+// import StatsCards from "@/components/StatsCards.vue"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { RotateCw } from "lucide-vue-next"
 
 const {
   data,
@@ -125,14 +125,13 @@ const {
   chartData,
   parameters,
   updateDateRange,
-  updateParameter,
   refreshData,
   fetchData,
 } = useAirQuality()
 
 const formatDateRange = () => {
-  return `${formatDate(filters.value.dateRange.from)} - ${formatDate(
-    filters.value.dateRange.to
+  return `${formatDate(filters.value.dateRange.startDate)} - ${formatDate(
+    filters.value.dateRange.endDate
   )}`
 }
 
@@ -140,15 +139,3 @@ onMounted(() => {
   fetchData()
 })
 </script>
-
-<style scoped>
-.container {
-  @apply max-w-7xl;
-}
-
-@media (max-width: 768px) {
-  .container {
-    @apply px-2;
-  }
-}
-</style>
