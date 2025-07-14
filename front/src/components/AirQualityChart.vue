@@ -141,6 +141,7 @@ const formatDateRange = (range: DateRange): string => {
   return `${formatDate(range.startDate)} - ${formatDate(range.endDate)}`
 }
 
+// TODO: move to a utility file
 const getQualityColor = (quality: string): string => {
   const colors = {
     good: "#10B981",
@@ -177,13 +178,15 @@ const chartOption = computed(() => {
         }
         const qualityText =
           qualityLabels[quality as keyof typeof qualityLabels] || "Unknown"
+        const formattedValue =
+          typeof value === "number" ? value.toFixed(2) : value
 
         return `
           <div class="p-2">
             <div class="font-medium">${date}</div>
             <div class="flex items-center gap-2">
               <span style="color: ${getQualityColor(quality)}">●</span>
-              ${props.selectedParameter.label}: ${value.toFixed(2)} ${
+              ${props.selectedParameter.label}: ${formattedValue} ${
           props.selectedParameter.unit
         }
             </div>
