@@ -14,7 +14,7 @@ export default function importCsvData(
   chunkSize: number = 500
 ): Promise<void> {
   return new Promise((resolve, reject) => {
-    const chunks: Record<string, any>[] = []
+    let chunks: Record<string, any>[] = []
     const stream = fs.createReadStream(filePath)
 
     stream
@@ -33,14 +33,15 @@ export default function importCsvData(
           },
           mapValues: ({ header, value }) => {
             value = value.trim() // remove leading/trailing whitespace
-            if (value === "" || value === "-200") return null
+            if (value === "") {
+              return null
+            }
             if (header === "time") {
               return value.replaceAll(".", ":")
             }
             if (header === "date") {
-              const date = value.split("/")
-              value = date.reverse().join("-")
-              return new Date(value)
+              const [day, month, year] = value.split("/")
+              return new Date(`${year}-${month}-${day}`)
             }
             value = value.replace(",", ".") // replace comma with dot for decimal values
             const numValue = parseFloat(value)
@@ -72,6 +73,13 @@ export default function importCsvData(
         delete data.date
         delete data.time
 
+        // convert all -200 values to null
+        for (const [key, value] of Object.entries(data)) {
+          if (value === -200 || value === "-200") {
+            data[key] = null
+          }
+        }
+
         chunks.push(data)
 
         if (chunks.length === chunkSize) {
@@ -85,7 +93,7 @@ export default function importCsvData(
               stream.destroy()
               reject(error)
             })
-          chunks.length = 0 // clear chunks immediately, if not fails
+          chunks = [] // clear chunks immediately, if not fails
         }
       })
       .on("end", () => {
