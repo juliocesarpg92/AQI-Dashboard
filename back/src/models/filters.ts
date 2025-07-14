@@ -2,8 +2,8 @@ import * as z from "zod/v4"
 
 export const filterSchema = z.object({
   parameters: z.array(z.string()).optional(),
-  startDate: z.iso.datetime().optional(),
-  endDate: z.iso.datetime().optional(),
+  startDate: z.number().min(0).optional(),
+  endDate: z.number().min(0).optional(),
 })
 
 export function validateFilterSchema(

@@ -4,7 +4,7 @@ export const queryCreateTableSchema = `
 -- Air Quality Monitoring Data Table
 CREATE TABLE air_quality_data (
     id SERIAL PRIMARY KEY,
-    timestamp TIMESTAMP NOT NULL,
+    timestamp BIGINT NOT NULL,
     co_gt DECIMAL(10,4),                    -- CO(GT) - Carbon monoxide reference
     pt08_s1_co INTEGER,                     -- PT08.S1(CO) - CO sensor response
     nmhc_gt DECIMAL(10,4),                  -- NMHC(GT) - Non-methane hydrocarbons reference
@@ -15,9 +15,9 @@ CREATE TABLE air_quality_data (
     no2_gt DECIMAL(10,4),                   -- NO2(GT) - Nitrogen dioxide reference
     pt08_s4_no2 INTEGER,                    -- PT08.S4(NO2) - NO2 sensor response
     pt08_s5_o3 INTEGER,                     -- PT08.S5(O3) - Ozone sensor response
-    temperature DECIMAL(5,2),               -- T - Temperature
-    relative_humidity DECIMAL(5,2),         -- RH - Relative humidity
-    absolute_humidity DECIMAL(10,6)         -- AH - Absolute humidity
+    temperature DECIMAL(5,2),               -- T - Temperature in Celsius
+    relative_humidity DECIMAL(5,2),         -- RH - Relative humidity percentage (0-100%)
+    absolute_humidity DECIMAL(6,3)          -- AH - Absolute humidity in g/m³ (improved precision)
 );
 
 -- Create indexes for common queries
@@ -90,7 +90,7 @@ export const prepareQueryFetchData = (filter: Filter) => {
   }
 
   // pagination
-  query += ` LIMIT 100 OFFSET 0`
+  query += ` ORDER BY timestamp`
 
   return { query, values }
 }
