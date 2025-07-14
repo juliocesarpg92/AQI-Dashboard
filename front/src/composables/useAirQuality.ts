@@ -97,23 +97,19 @@ export function useAirQuality() {
       // Determine automatic aggregation
       // filters.value.aggregation = determineAggregation(filters.value.dateRange)
 
-      // Get data and statistics in parallel
-      const [
-        chartDataResponse,
-        // statsData
-      ] = await Promise.all([
-        airQualityService.fetchData(filters.value).then((data) => {
-          return data.map((item) => ({
-            timestamp: new Date(item.timestamp),
+      // Get data
+      const chartDataResponse = await airQualityService
+        .fetchData(filters.value)
+        .then((result) => {
+          return result.map((item) => ({
+            timestamp: new Date(Number(item.timestamp)),
             value: Number(item[filters.value.parameter.key]),
             quality: airQualityService.getQualityLevel(
               item[filters.value.parameter.key],
               selectedParameter.value
             ),
           }))
-        }),
-        // airQualityService.getStats(filters.value),
-      ])
+        })
 
       data.value = chartDataResponse
       // stats.value = statsData

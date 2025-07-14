@@ -34,16 +34,36 @@ class AirQualityService {
 
   async fetchData(filters: AirQualityFilters): Promise<AirQualityData[]> {
     // Filter data by date range
-    const filteredData = this.mockData.filter(
-      (item) =>
-        item.timestamp >= filters.dateRange.startDate &&
-        item.timestamp <= filters.dateRange.endDate
-    )
+    // const filteredData = this.mockData.filter(
+    //   (item) =>
+    //     item.timestamp >= filters.dateRange.startDate &&
+    //     item.timestamp <= filters.dateRange.endDate
+    // )
+    try {
+      const response = await fetch("http://localhost:8000/filter", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          parameters: [filters.parameter.key],
+          startDate: filters.dateRange.startDate.getTime(),
+          endDate: filters.dateRange.endDate.getTime(),
+        }),
+      })
 
     // Aggregate data according to aggregation type
     // const aggregatedData = this.aggregateData(filteredData, filters)
 
-    return filteredData
+      const filteredData: AirQualityData[] = await response
+        .json()
+        .then((data) => data.data)
+
+      return filteredData
+    } catch (error) {
+      console.error("Error fetching air quality data:", error)
+      return []
+    }
   }
 
   // private aggregateData(

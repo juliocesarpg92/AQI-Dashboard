@@ -1,6 +1,5 @@
 export interface AirQualityData {
-  id: string
-  timestamp: Date
+  timestamp: number // Unix timestamp in milliseconds
   co_gt: number
   nmhc_gt: number
   c6h6_gt: number
@@ -14,11 +13,7 @@ export interface AirQualityData {
 export interface AirQualityParameter {
   key: keyof Omit<
     AirQualityData,
-    | "id"
-    | "timestamp"
-    | "temperature"
-    | "relative_humidity"
-    | "absolute_humidity"
+    "timestamp" | "temperature" | "relative_humidity" | "absolute_humidity"
   >
   label: string
   unit: string
