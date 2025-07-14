@@ -58,8 +58,8 @@ export function useAirQuality() {
   // Filters
   const filters = ref<AirQualityFilters>({
     dateRange: {
-      startDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // Last 7 days
-      endDate: new Date(),
+      startDate: new Date(2004, 2, 1, 0, 0, 0),
+      endDate: new Date(2005, 3, 4, 23, 59, 59),
     },
     parameter: parameters[0], // Default parameter
     // aggregation: "hourly",
@@ -104,8 +104,8 @@ export function useAirQuality() {
       ] = await Promise.all([
         airQualityService.fetchData(filters.value).then((data) => {
           return data.map((item) => ({
-            timestamp: item.timestamp,
-            value: item[filters.value.parameter.key],
+            timestamp: new Date(item.timestamp),
+            value: Number(item[filters.value.parameter.key]),
             quality: airQualityService.getQualityLevel(
               item[filters.value.parameter.key],
               selectedParameter.value
