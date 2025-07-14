@@ -72,20 +72,6 @@ export function useAirQuality() {
 
   const chartData = computed(() => data.value)
 
-  // Determine automatic aggregation based on date range
-  const determineAggregation = (
-    dateRange: DateRange
-  ): "hourly" | "daily" | "weekly" => {
-    const diffDays = Math.ceil(
-      (dateRange.endDate.getTime() - dateRange.startDate.getTime()) /
-        (1000 * 60 * 60 * 24)
-    )
-
-    if (diffDays <= 7) return "hourly"
-    if (diffDays <= 30) return "daily"
-    return "weekly"
-  }
-
   // Function to get data
   const fetchData = async () => {
     if (loading.value) return
@@ -94,9 +80,6 @@ export function useAirQuality() {
     error.value = null
 
     try {
-      // Determine automatic aggregation
-      // filters.value.aggregation = determineAggregation(filters.value.dateRange)
-
       // Get data
       const chartDataResponse = await airQualityService
         .fetchData(filters.value)
