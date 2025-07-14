@@ -100,8 +100,8 @@ const endDateInput = computed({
 
 const resetToDefault = () => {
   localRange.value = {
-    startDate: subDays(new Date(), 7),
-    endDate: new Date(),
+    startDate: new Date(2004, 2, 1, 0, 0, 0),
+    endDate: new Date(2005, 3, 4, 23, 59, 59),
   }
   emitUpdate()
 }
