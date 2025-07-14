@@ -41,9 +41,7 @@
           class="absolute inset-0 flex items-center justify-center bg-background/50"
         >
           <div class="flex items-center gap-2 text-muted-foreground">
-            <LoaderCircle
-              class="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"
-            />
+            <LoaderCircle class="w-4 h-4 animate-spin" />
             Loading data...
           </div>
         </div>
