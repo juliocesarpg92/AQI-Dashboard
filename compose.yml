@@ -1,0 +1,31 @@
+services:
+  db:
+    image: postgres:17.5-alpine3.22
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: database
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  back:
+    build:
+      context: ./back
+      dockerfile: Dockerfile
+      args:
+        APP_PORT: ${BACK_PORT:-8000} # ← Pass .env port to build
+    image: air_quality_backend
+    ports:
+      - "127.0.0.1:${BACK_PORT:-3000}:${BACK_PORT:-3000}"
+    env_file: back/.env
+    environment:
+      PORT: ${BACK_PORT:-3000}
+    depends_on:
+      - db
+    volumes:
+      - ./AirQualityUCI.csv:${CSV_FILE_PATH:-/app/data/AirQualityUCI.csv}
+
+volumes:
+  db_data:

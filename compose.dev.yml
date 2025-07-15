@@ -1,0 +1,12 @@
+services:
+  db:
+    image: postgres:17.5-alpine3.22
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: air_quality
+    ports:
+      - "5432:5432"
+    command: ["postgres", "-c", "log_statement=all"] # Enable logging for debugging
+    volumes:
+      - db_data:/var/lib/postgresql/data
