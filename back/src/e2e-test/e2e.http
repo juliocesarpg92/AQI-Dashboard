@@ -1,4 +1,4 @@
-@host = http://localhost:8000
+@host = http://localhost:8000 # check .env file for the correct port
 
 ### health Check
 GET {{host}}/health

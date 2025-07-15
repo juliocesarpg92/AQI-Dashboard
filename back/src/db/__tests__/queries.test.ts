@@ -17,7 +17,7 @@ describe("fetchDataByFilter", () => {
 
   test("should generate correct query with specific parameters", async () => {
     const expectedQueryBase =
-      "SELECT date, time, co_gt, no2_gt FROM air_quality_data WHERE 1=1"
+      "SELECT timestamp, co_gt, no2_gt FROM air_quality_data WHERE 1=1"
     const result = await prepareQueryFetchData({
       parameters: ["co_gt", "no2_gt"],
     })
@@ -31,8 +31,11 @@ describe("fetchDataByFilter", () => {
 
   test("should generate correct query with date range filter", async () => {
     const expectedQueryBase =
-      "SELECT * FROM air_quality_data WHERE 1=1 AND date >= $1 AND date <= $2"
-    const values = ["2023-01-01", "2023-12-31"]
+      "SELECT * FROM air_quality_data WHERE 1=1 AND timestamp >= $1 AND timestamp <= $2"
+    const values = [
+      new Date("2023-01-01").getTime(),
+      new Date("2023-12-31").getTime(),
+    ]
     const result = await prepareQueryFetchData({
       startDate: values[0],
       endDate: values[1],
@@ -48,14 +51,16 @@ describe("fetchDataByFilter", () => {
 
   test("should generate correct query with parameters and date range", async () => {
     const expectedQueryBase =
-      "SELECT date, time, co_gt, no2_gt FROM air_quality_data WHERE 1=1 AND date >= $1 AND date <= $2"
-    const values = ["2023-01-01", "2023-12-31"]
+      "SELECT timestamp, co_gt, no2_gt FROM air_quality_data WHERE 1=1 AND timestamp >= $1 AND timestamp <= $2"
+    const values = [
+      new Date("2023-01-01").getTime(),
+      new Date("2023-12-31").getTime(),
+    ]
     const result = await prepareQueryFetchData({
       parameters: ["co_gt", "no2_gt"],
       startDate: values[0],
       endDate: values[1],
     })
-    console.log("Generated query:", result.query)
 
     // Verify the generated query
     assert.ok(

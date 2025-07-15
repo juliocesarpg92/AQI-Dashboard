@@ -89,7 +89,6 @@ export const prepareQueryFetchData = (filter: Filter) => {
     values.push(endDate)
   }
 
-  // pagination
   query += ` ORDER BY timestamp`
 
   return { query, values }

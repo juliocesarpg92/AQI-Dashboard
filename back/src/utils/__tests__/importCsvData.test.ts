@@ -41,7 +41,7 @@ describe("importCsvData", () => {
       t: 13.6,
       rh: 48.9,
       ah: 0.7578,
-      timestamp: new Date(2004, 2, 10, 18, 0, 0),
+      timestamp: new Date(2004, 2, 10, 18, 0, 0).getTime(),
     }
 
     await writeFile(testCsvPath, csvData)
@@ -57,8 +57,6 @@ describe("importCsvData", () => {
     // Act
     await importCsvData(testCsvPath, chunkHandler, 500)
 
-    console.log("Processed Data:", processedData[0])
-    console.log("First record should match:", firstRowResult)
     // Assert
     assert.strictEqual(
       callCount,
