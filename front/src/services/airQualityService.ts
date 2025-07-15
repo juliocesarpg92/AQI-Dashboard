@@ -7,17 +7,20 @@ import type {
 class AirQualityService {
   async fetchData(filters: AirQualityFilters): Promise<AirQualityData[]> {
     try {
-      const response = await fetch("http://localhost:8000/filter", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          parameters: [filters.parameter.key],
-          startDate: filters.dateRange.startDate.getTime(),
-          endDate: filters.dateRange.endDate.getTime(),
-        }),
-      })
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_URL}/filter`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            parameters: [filters.parameter.key],
+            startDate: filters.dateRange.startDate.getTime(),
+            endDate: filters.dateRange.endDate.getTime(),
+          }),
+        }
+      )
 
       const filteredData: AirQualityData[] = await response
         .json()
