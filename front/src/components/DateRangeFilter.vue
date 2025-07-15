@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from "vue"
-import { format, differenceInDays, subDays } from "date-fns"
+import { format, differenceInDays } from "date-fns"
 
 import type { DateRange } from "@/types/air-quality"
 import { Card } from "@/components/ui/card"
