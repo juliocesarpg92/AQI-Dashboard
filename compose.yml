@@ -15,15 +15,28 @@ services:
       context: ./back
       dockerfile: Dockerfile
       args:
-        APP_PORT: ${BACK_PORT:-8000} # ← Pass .env port to build
+        APP_PORT: ${BACK_PORT:-8000} # Pass .env port to build
     image: air_quality_backend
     ports:
       - "127.0.0.1:${BACK_PORT:-3000}:${BACK_PORT:-3000}"
-    env_file: back/.env
+    env_file: .env
     depends_on:
       - db
     volumes:
       - ./AirQualityUCI.csv:${CSV_FILE_PATH:-/app/data/AirQualityUCI.csv}
+
+  front:
+    build:
+      context: ./front
+      dockerfile: Dockerfile
+      args:
+        VITE_BACKEND_URL: ${VITE_BACKEND_URL}
+    image: air_quality_frontend
+    ports:
+      - "127.0.0.1:${FRONT_PORT:-5147}:80"
+    env_file: .env
+    depends_on:
+      - back
 
 volumes:
   db_data:
