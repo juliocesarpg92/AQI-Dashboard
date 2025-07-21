@@ -31,7 +31,9 @@ COPY --from=builder --chown=hono:nodejs /app/package.json /app/package.json
 
 USER hono
 
-# Now EXPOSE uses the build argument
 EXPOSE ${APP_PORT}
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:${APP_PORT}/health || exit 1
 
 CMD ["node", "/app/dist/index.js"]
