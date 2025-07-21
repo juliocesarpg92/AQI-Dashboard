@@ -59,7 +59,7 @@ app.get("/health", (c) => {
 serve(
   {
     fetch: app.fetch,
-    port: process.env.PORT ? Number(process.env.PORT) : 3000,
+    port: process.env.BACK_PORT ? Number(process.env.BACK_PORT) : 3000,
   },
   (info) => {
     console.log(`Server is running on http://localhost:${info.port}`)

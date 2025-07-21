@@ -17,10 +17,13 @@ WORKDIR /app
 
 # Accept port as build argument
 ARG APP_PORT=3000
-ENV PORT=${APP_PORT}
 
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 hono
+# Create a non-root user and group
+# Use a specific UID and GID to avoid conflicts with host systems
+# This is important for security and compatibility with various environments
+RUN addgroup --system --gid 1001 nodejs && \
+  adduser --system --uid 1001 --ingroup nodejs hono && \
+  chown -R hono:nodejs /app
 
 COPY --from=builder --chown=hono:nodejs /app/node_modules /app/node_modules
 COPY --from=builder --chown=hono:nodejs /app/dist /app/dist
