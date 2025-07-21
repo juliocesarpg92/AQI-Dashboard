@@ -103,55 +103,45 @@ interface AirQualityData {
 - Node.js (v20 or higher)
 - PostgreSQL (v12 or higher)
 - npm (Node Package Manager)
+- **Download the [UCI Air Quality Dataset](https://archive.ics.uci.edu/dataset/360/air+quality) and place it in the `back` directory as `AirQualityUCI.csv`.**
+- **Execute `cp .env.example .env.development` in the root directory to create the environment file for development.**
 
 ### Installation Steps
 
-```bash
-# Database
-./start_dev.sh
+#### Start db
+1. On the root directory, run the following command to start the database:
+   ```bash
+    docker compose -f compose.yml -f compose.dev.yml up db -d
+    OR
+    ./start_db_development.sh
+   ```
 
-# Backend
-cd back
-npm install
-cp .env.example .env
-npm run dev
+#### Start backend
+1. from the root directory, execute `cd back`
+2. `npm install`
+3. check if the variable `CSV_FILE_PATH` in `.env.development` is set to the correct path of the CSV file
+4. `npm run dev`
 
-# Frontend  
-cd front
-npm install
-cp .env.example .env
-npm run dev
-```
+#### Start frontend
+1. from the root directory, execute `cd front`
+2. `npm install`
+5. `npm run dev`
+
+## Deployment
+
+### Prerequisites
+- Docker
+- Docker Compose
+- **Execute `cp .env.example .env` in the root directory to create the environment file for deployment.**
+
+### Deployment Steps
+1. Ensure the `.env` file is configured with production settings.
+2. Run the following command in the root directory:
+   ```bash
+   docker compose -f compose.yml up -d
+   OR
+   ./start_prod.sh
+   ```
 
 
-- [ ] backend
-  - [x] import CSV data into the database
-    - [x] test
-  - [x] API endpoints
-    - [x] schema validation
-    - [ ] error handling
-    - [ ] tests
-  - [ ] Database setup
-    <!-- - [ ] mount mongodb database -->
-    - [x] create tables if not exist
-    - [x] seed initial data (use the import CSV data step)
-      - [x] data has errors: 
-        - decimals numbers are not parsed correctly
-        - time is not parsed correctly
-      - [x] date/time fields should become timestamp field
-    - [ ] implement bulk insert
-    - [x] queries
-  - [ ] implement streaming API
-    - [ ] use server-sent events (SSE)
-    - [ ] use cursor instead of offset
-    
-- [ ] frontend
-  - [x] create a chart to display data
-  - [x] implement search functionality by parameter and date range
-    - [x] date range has error
-  - [ ] efficiently handle the data
-
-- [ ] Environment variables
-- [ ] Dockerize the application
-- [ ] update readme with instructions
 
