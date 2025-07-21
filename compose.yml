@@ -2,11 +2,11 @@ services:
   db:
     image: postgres:17.5-alpine3.22
     environment:
-      POSTGRES_USER: user
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: database
+      POSTGRES_USER: ${DB_USER:-user}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+      POSTGRES_DB: ${DB_NAME:-air_quality}
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
 
@@ -20,8 +20,6 @@ services:
     ports:
       - "127.0.0.1:${BACK_PORT:-3000}:${BACK_PORT:-3000}"
     env_file: back/.env
-    environment:
-      PORT: ${BACK_PORT:-3000}
     depends_on:
       - db
     volumes:
